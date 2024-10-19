@@ -1,10 +1,6 @@
 import fs from "fs";
 import PDFDocument from "pdfkit";
 
-const COMPANY_ADDRESS =
-  "Renu Sharma Foundation, VPO Baspadmka, Teh Pataudi, Dist Gurugram (HR), Pin 122503";
-
-const getCertificateContent = (name, post, startDate, endDate, tenure) => {
 const getCertificateContent = (name, post, startDate, endDate, tenure, department) => {
   return {
     subject: `Offer Letter for ${post}`,
@@ -33,16 +29,7 @@ const generateCertificate = async (
 ) => {
   console.log(name, email, post, startDate, endDate, tenure, department);
   return new Promise(async (resolve, reject) => {
-    const doc = new PDFDocument({
-      size: "A4",
-      margins: {
-        top: 50,
-        bottom: 50,
-        left: 50,
-        right: 50,
-      },
-    });
-
+    const doc = new PDFDocument();
     const buffers = [];
     const template = getCertificateContent(
       name,
@@ -55,13 +42,14 @@ const generateCertificate = async (
     const certificatePath = `${template.folderPath}/${name}_certificate.pdf`;
     const writeStream = fs.createWriteStream(certificatePath);
 
+    // Pipe the PDF document to buffers array
     doc.on("data", buffers.push.bind(buffers));
+    // Pipe the PDF document to write stream to save locally
     doc.pipe(writeStream);
 
     const backgroundImagePath = "images/logo-image.png";
     const backgroundImage = fs.readFileSync(backgroundImagePath);
 
-    doc.image(backgroundImage, 0, 60, {
     // Define the upper margin
     const upperMargin = 60;
 
@@ -69,18 +57,17 @@ const generateCertificate = async (
     doc.image(backgroundImage, 0, upperMargin, {
       width: doc.page.width + 2,
       height: doc.page.height - 210,
-      opacity: 0.001, // Very low opacity for shadow-like effect
+      opacity: 0.02, // Very low opacity for shadow-like effect
     });
 
+    doc.font("Helvetica");
+
+    // Header
     doc
       .fontSize(20)
       .fillColor("#000080") // Set header color to blue
       .font("Helvetica-Bold")
-      .fontSize(24)
-      .fillColor("green")
-      .text("Renu Sharma Healthcare Education & Foundation", {
-        align: "center",
-      });
+      .text("Renu Sharma Healthcare Education & Foundation", { align: "left" });
     doc.moveDown();
 
     // Date
@@ -107,7 +94,7 @@ const generateCertificate = async (
     if (template.endDate) doc.text(template.endDate, { align: "left" }).moveDown();
     if (template.tenure) doc.text(template.tenure, { align: "left" }).moveDown();
 
-    doc.text(template.closingContent, { align: "left" });
+    // Closing content
     doc
       .font("Helvetica")
       .text(template.closingContent, { continued: true })
@@ -122,6 +109,7 @@ const generateCertificate = async (
     // Final message
     doc.font("Helvetica").text(template.finalMessage, { align: "left" }).moveDown();
 
+    // Bottom border
     doc.lineWidth(25);
     doc.strokeColor("#000080");
     doc
