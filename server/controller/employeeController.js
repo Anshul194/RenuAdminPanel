@@ -5,13 +5,23 @@ import LorModel from "../models/lor.model.js";
 import pdfGenerator from "../Util/pdfGenerator.js";
 import OfferLetterGenerator from "../Util/offerLetterGenerator.js";
 import IccGenerator from "../Util/iccGenerator.js";
+import StarIntern from "../models/starintern.model.js";
+import StarInternGenerator from "../Util/starInternGenerator.js";
+import LorGenerator from '../Util/lorGenerator.js';
 
 // Generate Offer Letter
 const GenerateOfferLetter = async (req, res) => {
   try {
-    const { name, email, post, startDate, endDate , tenure } = req.body;
+    const { name, email, post, startDate, endDate, tenure } = req.body;
     // console.log(req.body);
-    const pdfBuffer = await OfferLetterGenerator(name, email, post,startDate, endDate , tenure);
+    const pdfBuffer = await OfferLetterGenerator(
+      name,
+      email,
+      post,
+      startDate,
+      endDate,
+      tenure
+    );
 
     const user = await offerletterModel.findOne({ email });
     if (user && user.pdfBuffer) {
@@ -31,7 +41,9 @@ const GenerateOfferLetter = async (req, res) => {
       await offerletter.save();
     }
 
-    return res.status(200).json({ message: "Offer letter generation successful" });
+    return res
+      .status(200)
+      .json({ message: "Offer letter generation successful" });
   } catch (err) {
     console.error("Error in GenerateOfferLetter:", err.message);
     return res.status(500).json({ error: "Internal Server Error" });
@@ -39,31 +51,43 @@ const GenerateOfferLetter = async (req, res) => {
 };
 const GenerateStarIntern = async (req, res) => {
   try {
-    const { name, email, post, certificateName } = req.body;
-    console.log(req.body);
-    const pdfBuffer = await pdfGenerator(name, email, post, certificateName);
+    const { name, email, post, duration, certificateName } = req.body;
+    console.log("starintern", req.body);
 
-    const user = await offerletterModel.findOne({ email });
+    // Generate the PDF certificate
+    const pdfBuffer = await StarInternGenerator(
+      name,
+      email,
+      post,
+      duration,
+      certificateName
+    );
+
+    // Check if the user already exists and has a PDF buffer
+    const user = await StarIntern.findOne({ email });
     if (user && user.pdfBuffer) {
       return res.status(200).json({
         message: `Offer letter is already generated for this user: ${name} (${email})`,
       });
     }
 
+    // Update the existing user's PDF buffer or create a new entry
     if (user) {
       user.pdfBuffer = pdfBuffer.buffer;
       await user.save();
     } else {
-      const offerletter = new offerletterModel({
+      const newIntern = new StarIntern({
         ...req.body,
         pdfBuffer: pdfBuffer.buffer,
       });
-      await offerletter.save();
+      await newIntern.save();
     }
 
-    return res.status(200).json({ message: "Star Inter generation successful" });
+    return res
+      .status(200)
+      .json({ message: "Star Intern generation successful" });
   } catch (err) {
-    console.error("Error in GenerateOfferLetter:", err.message);
+    console.error("Error in GenerateStarIntern:", err.message);
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
@@ -71,10 +95,19 @@ const GenerateStarIntern = async (req, res) => {
 // Generate ICC Letter
 const GenerateICC = async (req, res) => {
   try {
-    const { name, email, post,startDate, endDate, tenure ,  certificateName } = req.body;
+    const { name, email, post, startDate, endDate, tenure, certificateName } =
+      req.body;
     console.log("Icc");
-    console.log(name,email,post,certificateName);
-    const pdfBuffer = await IccGenerator(name, email, post,startDate, endDate , tenure ,  certificateName);
+    console.log(name, email, post, certificateName);
+    const pdfBuffer = await IccGenerator(
+      name,
+      email,
+      post,
+      startDate,
+      endDate,
+      tenure,
+      certificateName
+    );
 
     const user = await iccModel.findOne({ email });
     if (user && user.pdfBuffer) {
@@ -94,7 +127,9 @@ const GenerateICC = async (req, res) => {
       await icc.save();
     }
 
-    return res.status(200).json({ message: "ICC letter generation successful" });
+    return res
+      .status(200)
+      .json({ message: "ICC letter generation successful" });
   } catch (err) {
     console.error("Error in GenerateICC:", err.message);
     return res.status(500).json({ error: "Internal Server Error" });
@@ -105,8 +140,8 @@ const GenerateICC = async (req, res) => {
 const GenerateLOR = async (req, res) => {
   try {
     const { name, email, post, certificateName } = req.body;
-    console.log(name,email,post,certificateName);
-    const pdfBuffer = await pdfGenerator(name, email, post, certificateName);
+    console.log(name, email, post, certificateName);
+    const pdfBuffer = await LorGenerator(name, email, post, certificateName);
 
     const user = await LorModel.findOne({ email });
     if (user && user.pdfBuffer) {
@@ -154,7 +189,6 @@ const downloadOfferLetter = async (req, res) => {
   }
 };
 
-
 // Download ICC Letter
 const downloadICC = async (req, res) => {
   try {
@@ -175,7 +209,6 @@ const downloadICC = async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
 
 // Download LOR
 const downloadLOR = async (req, res) => {
@@ -201,7 +234,8 @@ const downloadLOR = async (req, res) => {
 const downloadStarIntern = async (req, res) => {
   try {
     const { email } = req.query;
-    const employee = await LorModel.findOne({ email });
+  
+    const employee = await StarIntern.findOne({ email });
     if (!employee || !employee.pdfBuffer) {
       return res.status(404).json({ error: "LOR not found" });
     }
@@ -209,7 +243,7 @@ const downloadStarIntern = async (req, res) => {
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename=${employee.name}_Letter_of_Recommendation.pdf`
+      `attachment; filename=${employee.name}_starIntern.pdf`
     );
     return res.status(200).send(employee.pdfBuffer);
   } catch (err) {
@@ -226,5 +260,5 @@ export {
   downloadOfferLetter,
   downloadICC,
   downloadLOR,
-  downloadStarIntern
+  downloadStarIntern,
 };
