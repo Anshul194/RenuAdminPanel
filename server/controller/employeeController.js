@@ -4,12 +4,13 @@ import offerletterModel from "../models/offerletter.model.js";
 import LorModel from "../models/lor.model.js";
 import pdfGenerator from "../Util/pdfGenerator.js";
 import OfferLetterGenerator from "../Util/offerLetterGenerator.js";
+import IccGenerator from "../Util/iccGenerator.js";
 
 // Generate Offer Letter
 const GenerateOfferLetter = async (req, res) => {
   try {
     const { name, email, post, startDate, endDate , tenure } = req.body;
-    console.log(req.body);
+    // console.log(req.body);
     const pdfBuffer = await OfferLetterGenerator(name, email, post,startDate, endDate , tenure);
 
     const user = await offerletterModel.findOne({ email });
@@ -70,8 +71,10 @@ const GenerateStarIntern = async (req, res) => {
 // Generate ICC Letter
 const GenerateICC = async (req, res) => {
   try {
-    const { name, email, post, certificateName } = req.body;
-    const pdfBuffer = await pdfGenerator(name, email, post, certificateName);
+    const { name, email, post,startDate, endDate, tenure ,  certificateName } = req.body;
+    console.log("Icc");
+    console.log(name,email,post,certificateName);
+    const pdfBuffer = await IccGenerator(name, email, post,startDate, endDate , tenure ,  certificateName);
 
     const user = await iccModel.findOne({ email });
     if (user && user.pdfBuffer) {

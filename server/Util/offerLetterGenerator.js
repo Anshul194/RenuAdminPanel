@@ -1,18 +1,28 @@
 import fs from "fs";
 import PDFDocument from "pdfkit";
 
+const COMPANY_ADDRESS =
+  "Renu Sharma Foundation, VPO Baspadmka, Teh Pataudi, Dist Gurugram (HR), Pin 122503";
+
 const getCertificateContent = (name, post, startDate, endDate, tenure) => {
   return {
-    subject: `Offer letter of ${post}`,
-    mainContent: `We are thrilled to extend an offer of employment for the position of ${post} intern at Renu Sharma Healthcare Education & Foundation. We were impressed by your qualifications and experience, and we believe that you will make a valuable addition to our team.`,
-    closingContent: `To accept this offer, please sign and return this letter by 3 days from now. If you have any questions or concerns, please do not hesitate to contact us at `,
+    subject: `Joining Offer: ${post} at Renu Sharma Healthcare Education & Foundation`,
+    mainContent: `
+      We are delighted to offer you the position of ${post} intern at Renu Sharma Healthcare Education & Foundation.
+      Your exceptional skills and experience make you an ideal fit for our team.
+      We believe your contributions will significantly impact our organization's growth.
+    `,
+    closingContent: `
+      To confirm your acceptance, please sign and return this letter within three days.
+      For queries, contact us at 9671457366 or Neha.rshefoundation@gmail.com.
+    `,
     finalMessage:
-      "We are excited about the possibility of you joining our team and look forward to your positive response.",
-    congratsMessage: "Congratulations!",
+      "We eagerly await your positive response and look forward to having you on board.",
+    congratsMessage: "Warmest congratulations on this exciting opportunity!",
     folderPath: "offerletter",
-    startDate: startDate ? `Start Date: ${startDate}` : "",
-    endDate: endDate ? `End Date: ${endDate}` : "",
-    tenure: tenure ? `Tenure: ${tenure}` : "",
+    startDate: startDate ? `Commencement Date: ${startDate}` : "",
+    endDate: endDate ? `Completion Date: ${endDate}` : "",
+    tenure: tenure ? `Duration: ${tenure}` : "",
   };
 };
 
@@ -26,7 +36,16 @@ const generateCertificate = async (
 ) => {
   console.log(name, email, post, startDate, endDate, tenure);
   return new Promise(async (resolve, reject) => {
-    const doc = new PDFDocument();
+    const doc = new PDFDocument({
+      size: "A4",
+      margins: {
+        top: 50,
+        bottom: 50,
+        left: 50,
+        right: 50,
+      },
+    });
+
     const buffers = [];
     const template = getCertificateContent(
       name,
@@ -38,70 +57,65 @@ const generateCertificate = async (
     const certificatePath = `${template.folderPath}/${name}_certificate.pdf`;
     const writeStream = fs.createWriteStream(certificatePath);
 
-    // Pipe the PDF document to buffers array
     doc.on("data", buffers.push.bind(buffers));
-    // Pipe the PDF document to write stream to save locally
     doc.pipe(writeStream);
 
     const backgroundImagePath = "images/logo-image.png";
     const backgroundImage = fs.readFileSync(backgroundImagePath);
 
-    // Define the upper margin
-    const upperMargin = 60;
-
-    // Draw the background image with the upper margin
-    doc.image(backgroundImage, 0, upperMargin, {
+    doc.image(backgroundImage, 0, 60, {
       width: doc.page.width + 2,
       height: doc.page.height - 210,
       opacity: 0.8,
     });
 
-    doc.font("Helvetica");
-
-    // Header
     doc
-      .fontSize(20)
-      .fillColor("green")
       .font("Helvetica-Bold")
-      .text("Renu Sharma Healthcare Education & Foundation", { align: "left" });
+      .fontSize(24)
+      .fillColor("green")
+      .text("Renu Sharma Healthcare Education & Foundation", {
+        align: "center",
+      });
     doc.moveDown();
 
-    // Address
     doc
-      .fontSize(12)
       .font("Helvetica")
+      .fontSize(14)
       .fillColor("black")
-      .text("Gurugram, Haryana", { align: "left" })
-      .text("Sector - 14", { align: "left" })
-      .text("Pincode: 122503", { align: "left" })
+      .text(`Address: ${COMPANY_ADDRESS}`, { align: "center" })
       .moveDown();
 
-    if (template.startDate)
-      doc.text(template.startDate, { align: "left" }).moveDown();
-    if (template.endDate)
-      doc.text(template.endDate, { align: "left" }).moveDown();
-    if (template.tenure)
-      doc.text(template.tenure, { align: "left" }).moveDown();
-
-    // Date
-    doc.text(`Date: ${new Date().toLocaleDateString()}`, { align: "left" });
-    doc.moveDown();
-
-    // Subject
-    doc.text(`Subject: ${template.subject}`, { align: "left" });
-    doc.moveDown();
-
-    // Salutation
-    doc.text(`Dear ${name},`, { align: "left" });
-    doc.moveDown();
-
-    // Main content
-    doc.text(template.mainContent, { align: "left" });
-    doc.moveDown();
-
-    // Closing content
     doc
-      .text(template.closingContent, { continued: true })
+      .fontSize(14)
+      .fillColor("black")
+      .text(template.startDate, { align: "center" })
+      .text(template.endDate, { align: "center" })
+      .text(template.tenure, { align: "center" })
+      .moveDown();
+
+    doc
+      .fontSize(14)
+      .fillColor("black")
+      .text(`Date: ${new Date().toLocaleDateString()}`, { align: "center" })
+      .moveDown();
+
+    doc
+      .fontSize(18)
+      .fillColor("blue")
+      .text(template.subject, { align: "center" });
+    doc.moveDown();
+
+    doc
+      .fontSize(14)
+      .fillColor("black")
+      .text(`Dear ${name},`, { align: "left" })
+      .moveDown();
+
+    doc.text(template.mainContent, { align: "left", width: 500 });
+    doc.moveDown();
+
+    doc.text(template.closingContent, { align: "left" });
+    doc
       .font("Helvetica-Bold")
       .text("9671457366", { continued: true })
       .font("Helvetica")
@@ -110,19 +124,20 @@ const generateCertificate = async (
       .text("Neha.rshefoundation@gmail.com");
     doc.moveDown();
 
-    // Final message
-    doc.text(template.finalMessage, { align: "left" });
-    doc.moveDown();
+    doc
+      .fontSize(14)
+      .fillColor("black")
+      .text(template.finalMessage, { align: "left" })
+      .moveDown();
 
-    // Congratulatory message
-    doc.text(template.congratsMessage, { align: "left" });
-    doc.moveDown();
+    doc
+      .fontSize(14)
+      .fillColor("black")
+      .text(template.congratsMessage, { align: "left" })
+      .moveDown();
 
-    // Additional information if available
-    // Name
     doc.text(`Name - ${name}`, { align: "left" });
 
-    // Bottom border
     doc.lineWidth(25);
     doc.strokeColor("#000080");
     doc
