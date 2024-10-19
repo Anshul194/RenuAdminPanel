@@ -7,20 +7,22 @@ import OfferLetterGenerator from "../Util/offerLetterGenerator.js";
 import IccGenerator from "../Util/iccGenerator.js";
 import StarIntern from "../models/starintern.model.js";
 import StarInternGenerator from "../Util/starInternGenerator.js";
-import LorGenerator from '../Util/lorGenerator.js';
+import LorGenerator from "../Util/lorGenerator.js";
 
 // Generate Offer Letter
 const GenerateOfferLetter = async (req, res) => {
   try {
-    const { name, email, post, startDate, endDate, tenure } = req.body;
-    // console.log(req.body);
+    const { name, email, post, startDate, endDate, tenure, department } =
+      req.body;
+    console.log(req.body);
     const pdfBuffer = await OfferLetterGenerator(
       name,
       email,
       post,
       startDate,
       endDate,
-      tenure
+      tenure,
+      department
     );
 
     const user = await offerletterModel.findOne({ email });
@@ -51,7 +53,7 @@ const GenerateOfferLetter = async (req, res) => {
 };
 const GenerateStarIntern = async (req, res) => {
   try {
-    const { name, email, post, duration, certificateName } = req.body;
+    const { name, email, post, duration, department } = req.body;
     console.log("starintern", req.body);
 
     // Generate the PDF certificate
@@ -60,7 +62,7 @@ const GenerateStarIntern = async (req, res) => {
       email,
       post,
       duration,
-      certificateName
+      department,
     );
 
     // Check if the user already exists and has a PDF buffer
@@ -95,19 +97,10 @@ const GenerateStarIntern = async (req, res) => {
 // Generate ICC Letter
 const GenerateICC = async (req, res) => {
   try {
-    const { name, email, post, startDate, endDate, tenure, certificateName } =
-      req.body;
+    const { name, email, post,startDate, endDate, tenure ,  certificateName ,department} = req.body;
     console.log("Icc");
-    console.log(name, email, post, certificateName);
-    const pdfBuffer = await IccGenerator(
-      name,
-      email,
-      post,
-      startDate,
-      endDate,
-      tenure,
-      certificateName
-    );
+    console.log(name,email,post,certificateName);
+    const pdfBuffer = await IccGenerator(name, email, post,startDate, endDate , tenure ,  certificateName,department);
 
     const user = await iccModel.findOne({ email });
     if (user && user.pdfBuffer) {
@@ -139,9 +132,9 @@ const GenerateICC = async (req, res) => {
 // Generate LOR
 const GenerateLOR = async (req, res) => {
   try {
-    const { name, email, post, certificateName } = req.body;
-    console.log(name, email, post, certificateName);
-    const pdfBuffer = await LorGenerator(name, email, post, certificateName);
+    const { name, email, post, certificateName,department } = req.body;
+    console.log(name, email, post, certificateName,department);
+    const pdfBuffer = await LorGenerator(name, email, post, certificateName,department);
 
     const user = await LorModel.findOne({ email });
     if (user && user.pdfBuffer) {
@@ -227,14 +220,14 @@ const downloadLOR = async (req, res) => {
     return res.status(200).send(employee.pdfBuffer);
   } catch (err) {
     console.error("Error in downloadLOR:", err.message);
-    return res.status(500).json({ error:err.message });
+    return res.status(500).json({ error: err.message });
   }
 };
 
 const downloadStarIntern = async (req, res) => {
   try {
     const { email } = req.query;
-  
+
     const employee = await StarIntern.findOne({ email });
     if (!employee || !employee.pdfBuffer) {
       return res.status(404).json({ error: "LOR not found" });
@@ -248,7 +241,7 @@ const downloadStarIntern = async (req, res) => {
     return res.status(200).send(employee.pdfBuffer);
   } catch (err) {
     console.error("Error in downloadLOR:", err.message);
-    return res.status(500).json({ error: err.message});
+    return res.status(500).json({ error: err.message });
   }
 };
 

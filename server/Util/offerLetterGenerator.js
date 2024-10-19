@@ -57,7 +57,7 @@ const generateCertificate = async (
     doc.image(backgroundImage, 0, upperMargin, {
       width: doc.page.width + 2,
       height: doc.page.height - 210,
-      opacity: 0.02, // Very low opacity for shadow-like effect
+      opacity: 0.001, // Very low opacity for shadow-like effect
     });
 
     doc.font("Helvetica");
