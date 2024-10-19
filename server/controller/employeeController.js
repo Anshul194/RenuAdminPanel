@@ -8,9 +8,9 @@ import OfferLetterGenerator from "../Util/offerLetterGenerator.js";
 // Generate Offer Letter
 const GenerateOfferLetter = async (req, res) => {
   try {
-    const { name, email, post, startDate, endDate , tenure } = req.body;
+    const { name, email, post, startDate, endDate , tenure ,department} = req.body;
     console.log(req.body);
-    const pdfBuffer = await OfferLetterGenerator(name, email, post,startDate, endDate , tenure);
+    const pdfBuffer = await OfferLetterGenerator(name, email, post,startDate, endDate , tenure,department);
 
     const user = await offerletterModel.findOne({ email });
     if (user && user.pdfBuffer) {
