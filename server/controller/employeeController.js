@@ -3,9 +3,40 @@ import iccModel from "../models/icc.model.js";
 import offerletterModel from "../models/offerletter.model.js";
 import LorModel from "../models/lor.model.js";
 import pdfGenerator from "../Util/pdfGenerator.js";
+import OfferLetterGenerator from "../Util/offerLetterGenerator.js";
 
 // Generate Offer Letter
 const GenerateOfferLetter = async (req, res) => {
+  try {
+    const { name, email, post, startDate, endDate , tenure } = req.body;
+    console.log(req.body);
+    const pdfBuffer = await OfferLetterGenerator(name, email, post,startDate, endDate , tenure);
+
+    const user = await offerletterModel.findOne({ email });
+    if (user && user.pdfBuffer) {
+      return res.status(200).json({
+        message: `Offer letter is already generated for this user: ${name} (${email})`,
+      });
+    }
+
+    if (user) {
+      user.pdfBuffer = pdfBuffer.buffer;
+      await user.save();
+    } else {
+      const offerletter = new offerletterModel({
+        ...req.body,
+        pdfBuffer: pdfBuffer.buffer,
+      });
+      await offerletter.save();
+    }
+
+    return res.status(200).json({ message: "Offer letter generation successful" });
+  } catch (err) {
+    console.error("Error in GenerateOfferLetter:", err.message);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+const GenerateStarIntern = async (req, res) => {
   try {
     const { name, email, post, certificateName } = req.body;
     console.log(req.body);
@@ -29,7 +60,7 @@ const GenerateOfferLetter = async (req, res) => {
       await offerletter.save();
     }
 
-    return res.status(200).json({ message: "Offer letter generation successful" });
+    return res.status(200).json({ message: "Star Inter generation successful" });
   } catch (err) {
     console.error("Error in GenerateOfferLetter:", err.message);
     return res.status(500).json({ error: "Internal Server Error" });
@@ -101,23 +132,25 @@ const GenerateLOR = async (req, res) => {
 
 // Download Offer Letter
 const downloadOfferLetter = async (req, res) => {
-  console.log("hello");
   try {
     const { email } = req.query;
-    console.log(email);
     const employee = await offerletterModel.findOne({ email });
     if (!employee || !employee.pdfBuffer) {
       return res.status(404).json({ error: "Offer letter not found" });
     }
 
     res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", `attachment; filename=Offer_letter.pdf`);
-    return res.status(200).send(employee.pdfBuffer);  // Status added
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=${employee.name}_Offer_Letter.pdf`
+    );
+    return res.status(200).send(employee.pdfBuffer);
   } catch (err) {
     console.error("Error in downloadOfferLetter:", err.message);
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
 
 // Download ICC Letter
 const downloadICC = async (req, res) => {
@@ -131,14 +164,15 @@ const downloadICC = async (req, res) => {
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename=Internship_Completion_Certificate.pdf`
+      `attachment; filename=${employee.name}_Internship_Completion_Certificate.pdf`
     );
-    return res.status(200).send(employee.pdfBuffer);  // Status added
+    return res.status(200).send(employee.pdfBuffer);
   } catch (err) {
     console.error("Error in downloadICC:", err.message);
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
 
 // Download LOR
 const downloadLOR = async (req, res) => {
@@ -152,9 +186,29 @@ const downloadLOR = async (req, res) => {
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename=Letter_of_Recommendation.pdf`
+      `attachment; filename=${employee.name}_Letter_of_Recommendation.pdf`
     );
-    return res.status(200).send(employee.pdfBuffer);  // Status added
+    return res.status(200).send(employee.pdfBuffer);
+  } catch (err) {
+    console.error("Error in downloadLOR:", err.message);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+const downloadStarIntern = async (req, res) => {
+  try {
+    const { email } = req.query;
+    const employee = await LorModel.findOne({ email });
+    if (!employee || !employee.pdfBuffer) {
+      return res.status(404).json({ error: "LOR not found" });
+    }
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=${employee.name}_Letter_of_Recommendation.pdf`
+    );
+    return res.status(200).send(employee.pdfBuffer);
   } catch (err) {
     console.error("Error in downloadLOR:", err.message);
     return res.status(500).json({ error: "Internal Server Error" });
@@ -165,7 +219,9 @@ export {
   GenerateOfferLetter,
   GenerateICC,
   GenerateLOR,
+  GenerateStarIntern,
   downloadOfferLetter,
   downloadICC,
   downloadLOR,
+  downloadStarIntern
 };

@@ -1,6 +1,5 @@
 import fs from "fs";
 import PDFDocument from "pdfkit";
-import employeeModel from "../models/Employee.js";
 
 const getCertificateContent = (certificateName, name, post) => {
   const templates = {
@@ -35,7 +34,7 @@ const getCertificateContent = (certificateName, name, post) => {
   return templates[certificateName.toLowerCase()] || templates.offerletter;
 };
 
-const generateCertificate = async (name, email, post, certificateName) => {
+const generateCertificate = async (name, email, post, startDate, endDate , certificateName) => {
   console.log(name, email, post, certificateName);
   return new Promise(async (resolve, reject) => {
     const doc = new PDFDocument();
@@ -141,15 +140,6 @@ const generateCertificate = async (name, email, post, certificateName) => {
       const pdfBuffer = fs.readFileSync(certificatePath);
 
       try {
-        // const certificate = await employeeModel.findOneAndUpdate(
-        //   { email: email },
-        //   {
-        //     $set: {
-        //       [certificateName.toLowerCase()]: pdfBuffer,
-        //     },
-        //   },
-        //   { new: true }
-        // );
 
         console.log(`Certificate stored in the database for ${email}`);
         resolve({ path: certificatePath, buffer: Buffer.concat(buffers) });

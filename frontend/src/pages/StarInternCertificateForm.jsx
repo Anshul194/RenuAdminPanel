@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 
 const StarInternCertificateForm = () => {
   const [formData, setFormData] = useState({
-    fullName: '',
+    name : '',
     email: '',
-    phoneNumber: '',
+    phone : '',
     department: '',
     post: '',
     duration: '', 
+    certificateName:''
   });
 
   const [errors, setErrors] = useState({});
@@ -27,9 +28,9 @@ const StarInternCertificateForm = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.fullName) newErrors.fullName = "Full Name is required.";
+    if (!formData.name ) newErrors.name  = "Full Name is required.";
     if (!formData.email) newErrors.email = "Email is required.";
-    if (!formData.phoneNumber) newErrors.phoneNumber = "Phone Number is required.";
+    if (!formData.phone ) newErrors.phone  = "Phone Number is required.";
     if (!formData.department) newErrors.department = "Department is required.";
     if (!formData.post) newErrors.post = "Post is required.";
     if (!formData.duration) newErrors.duration = "Duration is required."; // Validate duration
@@ -56,13 +57,13 @@ const StarInternCertificateForm = () => {
           <label className="block text-gray-600">Full Name</label>
           <input
             type="text"
-            name="fullName"
-            value={formData.fullName}
+            name="name "
+            value={formData.name }
             onChange={handleChange}
-            className={`w-full p-2 border ${errors.fullName ? 'border-red-500' : 'border-gray-300'} rounded`}
+            className={`w-full p-2 border ${errors.name  ? 'border-red-500' : 'border-gray-300'} rounded`}
             required
           />
-          {errors.fullName && <span className="text-red-500 text-sm">{errors.fullName}</span>}
+          {errors.name  && <span className="text-red-500 text-sm">{errors.name }</span>}
         </div>
 
         <div>
@@ -82,13 +83,13 @@ const StarInternCertificateForm = () => {
           <label className="block text-gray-600">Phone Number</label>
           <input
             type="tel"
-            name="phoneNumber"
-            value={formData.phoneNumber}
+            name="phone "
+            value={formData.phone }
             onChange={handleChange}
-            className={`w-full p-2 border ${errors.phoneNumber ? 'border-red-500' : 'border-gray-300'} rounded`}
+            className={`w-full p-2 border ${errors.phone  ? 'border-red-500' : 'border-gray-300'} rounded`}
             required
           />
-          {errors.phoneNumber && <span className="text-red-500 text-sm">{errors.phoneNumber}</span>}
+          {errors.phone  && <span className="text-red-500 text-sm">{errors.phone }</span>}
         </div>
 
         <div>

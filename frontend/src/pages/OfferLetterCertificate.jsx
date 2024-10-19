@@ -58,9 +58,10 @@ const OfferLetterCertificateForm = () => {
       );
 
       const fileName =
-        headers["content-disposition"]
-          ?.split("filename=")[1]
-          ?.replace(/"/g, "") || "offer_letter.pdf";
+      headers["content-disposition"]
+        ?.split("filename=")[1]
+        ?.replace(/"/g, "") || `${formData.name}_offerletter.pdf`;
+
 
       const blob = new Blob([data], {
         type: headers["content-type"] || "application/pdf",
