@@ -139,9 +139,9 @@ const GenerateICC = async (req, res) => {
 // Generate LOR
 const GenerateLOR = async (req, res) => {
   try {
-    const { name, email, post, certificateName } = req.body;
-    console.log(name, email, post, certificateName);
-    const pdfBuffer = await LorGenerator(name, email, post, certificateName);
+    const { name, email, post, certificateName,department } = req.body;
+    console.log(name, email, post, certificateName,department);
+    const pdfBuffer = await LorGenerator(name, email, post, certificateName,department);
 
     const user = await LorModel.findOne({ email });
     if (user && user.pdfBuffer) {
