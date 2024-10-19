@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const ICCCertificateForm = () => {
   const [formData, setFormData] = useState({
@@ -72,6 +73,7 @@ const ICCCertificateForm = () => {
       URL.revokeObjectURL(link.href);
     } catch (err) {
       console.error("Error in downloading file:", err);
+      toast.error(err.response.data.error);
     }
   };
 
@@ -93,11 +95,12 @@ const ICCCertificateForm = () => {
       );
 
       console.log("Form submitted successfully:", response);
+      toast.success("Form submitted successfully!");
 
       // Trigger download immediately after successful form submission
       await handleDownload();
     } catch (err) {
-      console.error("Error submitting form:", err);
+      toast.error(err.response.data.error);
     }
   };
 

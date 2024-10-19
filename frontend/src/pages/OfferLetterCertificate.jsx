@@ -1,5 +1,6 @@
 import axios from "axios";
 import React, { useState } from "react";
+import { toast } from "react-toastify";
 
 const OfferLetterCertificateForm = () => {
   const [formData, setFormData] = useState({
@@ -58,10 +59,9 @@ const OfferLetterCertificateForm = () => {
       );
 
       const fileName =
-      headers["content-disposition"]
-        ?.split("filename=")[1]
-        ?.replace(/"/g, "") || `${formData.name}_offerletter.pdf`;
-
+        headers["content-disposition"]
+          ?.split("filename=")[1]
+          ?.replace(/"/g, "") || `${formData.name}_offerletter.pdf`;
 
       const blob = new Blob([data], {
         type: headers["content-type"] || "application/pdf",
@@ -76,6 +76,8 @@ const OfferLetterCertificateForm = () => {
       URL.revokeObjectURL(link.href);
     } catch (err) {
       console.error("Error in downloading file:", err);
+      toast.error(err.response.data.error);
+
     }
   };
 
@@ -97,11 +99,13 @@ const OfferLetterCertificateForm = () => {
       );
 
       console.log("Form submitted successfully:", response);
+      toast.success(response.data.message);
 
       // Trigger download immediately after successful form submission
-     await handleDownload();
+      await handleDownload();
     } catch (err) {
-      console.error("Error submitting form:", err);
+      toast.error(err.response.data.error);
+
     }
   };
 

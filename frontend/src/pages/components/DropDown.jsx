@@ -30,7 +30,7 @@ const InternshipDropdown = () => {
       "Business Executive"
     ]
   };
-
+ 
   return (
     <div className="w-full max-w-md mx-auto">
       {/* Main Dropdown Button */}

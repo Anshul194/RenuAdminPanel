@@ -1,49 +1,20 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState } from "react";
+import axios, { Axios, AxiosError } from "axios";
+import DropDown from "./components/DropDown.jsx";
+
+import { toast } from "react-toastify";
 
 const LORCertificateForm = () => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    department: '',
-    post: '',
-    certificateName:'lor'
+    name: "",
+    email: "",
+    phone: "",
+    department: "",
+    post: "",
+    certificateName: "lor",
   });
 
   const [errors, setErrors] = useState({});
-
-  const handleDownload = async () => {
-    try {
-      const { data, headers } = await axios.get(
-        "http://localhost:8000/api/employee/lor",
-        {
-          params: { email: formData.email },
-          responseType: "blob", // This ensures the response is treated as a binary file
-        }
-      );
-
-      const fileName =
-        headers["content-disposition"]
-          ?.split("filename=")[1]
-          ?.replace(/"/g, "") || `${formData.name}_lor.pdf`;
-
-
-      const blob = new Blob([data], {
-        type: headers["content-type"] || "application/pdf",
-      });
-
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.setAttribute("download", fileName);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(link.href);
-    } catch (err) {
-      console.error("Error in downloading file:", err);
-    }
-  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -55,7 +26,7 @@ const LORCertificateForm = () => {
     // Clear error for the changed field
     setErrors((prevErrors) => ({
       ...prevErrors,
-      [name]: '',
+      [name]: "",
     }));
   };
 
@@ -76,9 +47,6 @@ const LORCertificateForm = () => {
       setErrors(formErrors);
       return;
     }
-    // Here, handle the form submission logic, like sending data to the backend
-    console.log("Star Intern Certificate Form submitted:", formData);
-
 
     try {
       const response = await axios.post(
@@ -87,12 +55,47 @@ const LORCertificateForm = () => {
         { withCredentials: true }
       );
 
+      toast.success("Form submitted successfully!");
       console.log("Form submitted successfully:", response);
 
       // Trigger download immediately after successful form submission
-     await handleDownload();
+      await handleDownload();
     } catch (err) {
-      console.error("Error submitting form:", err);
+      toast.error(err.response.data.error);
+    }
+  };
+
+  const handleDownload = async () => {
+    try {
+      const { data, headers } = await axios.get(
+        "http://localhost:8000/api/employee/lor",
+        {
+          params: { email: formData.email },
+          responseType: "blob",
+        }
+      );
+
+      const fileName =
+        headers["content-disposition"]
+          ?.split("filename=")[1]
+          ?.replace(/"/g, "") || `${formData.name}_lor.pdf`;
+
+      const blob = new Blob([data], {
+        type: headers["content-type"] || "application/pdf",
+      });
+
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.setAttribute("download", fileName);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(link.href);
+
+      toast.success("LOR Certificate downloaded successfully!");
+    } catch (err) {
+      toast.error("Error downloading the LOR Certificate.");
+      console.error("Error in downloading file:", err);
     }
   };
 
@@ -109,10 +112,14 @@ const LORCertificateForm = () => {
             name="name"
             value={formData.name}
             onChange={handleChange}
-            className={`w-full p-2 border ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded`}
+            className={`w-full p-2 border ${
+              errors.name ? "border-red-500" : "border-gray-300"
+            } rounded`}
             required
           />
-          {errors.name && <span className="text-red-500 text-sm">{errors.name}</span>}
+          {errors.name && (
+            <span className="text-red-500 text-sm">{errors.name}</span>
+          )}
         </div>
 
         <div>
@@ -122,10 +129,14 @@ const LORCertificateForm = () => {
             name="email"
             value={formData.email}
             onChange={handleChange}
-            className={`w-full p-2 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded`}
+            className={`w-full p-2 border ${
+              errors.email ? "border-red-500" : "border-gray-300"
+            } rounded`}
             required
           />
-          {errors.email && <span className="text-red-500 text-sm">{errors.email}</span>}
+          {errors.email && (
+            <span className="text-red-500 text-sm">{errors.email}</span>
+          )}
         </div>
 
         <div>
@@ -135,10 +146,14 @@ const LORCertificateForm = () => {
             name="phone"
             value={formData.phone}
             onChange={handleChange}
-            className={`w-full p-2 border ${errors.phone ? 'border-red-500' : 'border-gray-300'} rounded`}
+            className={`w-full p-2 border ${
+              errors.phone ? "border-red-500" : "border-gray-300"
+            } rounded`}
             required
           />
-          {errors.phone && <span className="text-red-500 text-sm">{errors.phone}</span>}
+          {errors.phone && (
+            <span className="text-red-500 text-sm">{errors.phone}</span>
+          )}
         </div>
 
         <div>
@@ -148,10 +163,14 @@ const LORCertificateForm = () => {
             name="department"
             value={formData.department}
             onChange={handleChange}
-            className={`w-full p-2 border ${errors.department ? 'border-red-500' : 'border-gray-300'} rounded`}
+            className={`w-full p-2 border ${
+              errors.department ? "border-red-500" : "border-gray-300"
+            } rounded`}
             required
           />
-          {errors.department && <span className="text-red-500 text-sm">{errors.department}</span>}
+          {errors.department && (
+            <span className="text-red-500 text-sm">{errors.department}</span>
+          )}
         </div>
 
         <div>
@@ -161,17 +180,18 @@ const LORCertificateForm = () => {
             name="post"
             value={formData.post}
             onChange={handleChange}
-            className={`w-full p-2 border ${errors.post ? 'border-red-500' : 'border-gray-300'} rounded`}
+            className={`w-full p-2 border ${
+              errors.post ? "border-red-500" : "border-gray-300"
+            } rounded`}
             required
           />
-          {errors.post && <span className="text-red-500 text-sm">{errors.post}</span>}
+          {errors.post && (
+            <span className="text-red-500 text-sm">{errors.post}</span>
+          )}
         </div>
       </div>
 
-      <button
-        type="submit"
-        className="bg-blue-600 text-white p-2 rounded-md"
-      >
+      <button type="submit" className="bg-blue-600 text-white p-2 rounded-md">
         Generate LOR
       </button>
     </form>

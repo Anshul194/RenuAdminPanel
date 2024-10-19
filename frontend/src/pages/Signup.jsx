@@ -4,6 +4,7 @@ import { useNavigate } from "react-router";
 import axios from "axios";
 import Cookies from "js-cookie"; // Import js-cookie
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function Signup() {
   const [name, setName] = useState("");
@@ -31,12 +32,12 @@ function Signup() {
           withCredentials: true,
         }
       );
-      alert("Signup successful!");
-
-       navigate("/sidebar");
+      toast.success("login Successfull");
+      navigate("/sidebar");
     } catch (err) {
       console.log(err);
       setErrorMessage("Signup failed. Please try again.");
+      toast.error(err.response.data.error);
     }
   };
 

@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import loginSvg from "../../public/Group.png";
 import { useNavigate } from "react-router";
 import axios from "axios";
+import { toast } from "react-toastify";
+
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -18,6 +20,7 @@ function Login() {
       },{
         withCredentials:true
       });
+      toast.success("login Successfull");
       console.log("Login successful!", response.data);
       navigate("/sidebar");
 
@@ -25,6 +28,7 @@ function Login() {
     } catch (err) {
       console.log(err);
       setErrorMessage("Login failed. Please check your credentials.");
+      toast.error(err.response.data.error);
     }
   };
 
