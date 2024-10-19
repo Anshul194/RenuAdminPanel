@@ -7,7 +7,8 @@ const getCertificateContent = (
   post,
   startDate,
   endDate,
-  tenure
+  tenure,
+  department
 ) => {
   const templates = {
     icc: {
@@ -17,12 +18,12 @@ const getCertificateContent = (
         name: "Renu Sharma Healthcare Education & Foundation",
         tagline: "Nurturing Tomorrow's Healthcare Leaders",
       },
-      mainContent: `With great pleasure, we hereby certify that\n\n${name}\n\nhas successfully completed an intensive internship program as\n\n${post}\n\nat Renu Sharma Healthcare Education & Foundation, demonstrating exceptional proficiency and dedication throughout their tenure of ${tenure}, from ${startDate} to ${endDate}.`,
+      mainContent: `With great pleasure, we hereby certify that\n\n${name}\n\nhas successfully completed an intensive internship program as\n\n${post}\n\nin the ${department}  at Renu Sharma Healthcare Education & Foundation, demonstrating exceptional proficiency and dedication throughout their tenure of ${tenure}, from ${startDate} to ${endDate}.`,
       achievements: [
         "Demonstrated outstanding professional growth and learning aptitude",
         "Contributed significantly to organizational objectives",
         "Exhibited strong leadership and teamwork qualities",
-        "Maintained highest standards of professional conduct"
+        "Maintained the highest standards of professional conduct"
       ],
       endorsement: "Throughout the internship period, the candidate has shown remarkable initiative, intellectual curiosity, and a commitment to excellence that exemplifies the values of our organization.",
       impactStatement: "Their contributions have made a lasting positive impact on our projects and team dynamics.",
@@ -42,13 +43,14 @@ const generateCertificate = async (
   startDate,
   endDate,
   tenure,
-  certificateName
+  certificateName,
+  department
 ) => {
   console.log("inside icc generator", name, email, post, startDate, endDate, tenure, certificateName);
   return new Promise(async (resolve, reject) => {
     try {
       // Ensure directory exists
-      const template = getCertificateContent(certificateName, name, post, startDate, endDate, tenure);
+      const template = getCertificateContent(certificateName, name, post, startDate, endDate, tenure, department);
       if (!fs.existsSync(template.folderPath)) {
         fs.mkdirSync(template.folderPath, { recursive: true });
       }
@@ -56,7 +58,7 @@ const generateCertificate = async (
       const doc = new PDFDocument({
         margin: 50,
         size: "A4",
-        layout: "landscape"
+        layout: "portrait" // Changed to portrait for better fit
       });
     
       const buffers = [];
@@ -98,42 +100,49 @@ const generateCertificate = async (
         console.warn("Logo image not found, continuing without watermark");
       }
 
+      
+      // Certificate ID
+      doc.font('Helvetica')
+         .fontSize(12)
+         .fillColor("#2A9D8F")
+         .text(`Certificate ID: ${template.certificationNumber}`, { align: "right" })
+         .moveDown(1.5); // Space below the ID
       // Header Section
       doc.font('Helvetica-Bold')
-         .fontSize(36)
+         .fontSize(28) // Slightly smaller to fit content
          .fillColor("#1D3557")
          .text(template.title, { align: "center" })
          .moveDown(0.3);
 
       doc.font('Helvetica')
-         .fontSize(18)
+         .fontSize(16) // Adjusted size for subtitle
          .fillColor("#2A9D8F")
          .text(template.subtitle, { align: "center" })
          .moveDown(1);
 
       // Organization details
       doc.font('Helvetica-Bold')
-         .fontSize(24)
+         .fontSize(20) // Slightly smaller for organization name
          .fillColor("#234E70")
          .text(template.organization.name, { align: "center" })
          .moveDown(0.3);
 
       doc.font('Helvetica')
-         .fontSize(16)
+         .fontSize(14) // Adjusted size for tagline
          .fillColor("#2A9D8F")
          .text(template.organization.tagline, { align: "center" })
          .moveDown(1.5);
 
       // Main content
       doc.font('Helvetica')
-         .fontSize(14)
+         .fontSize(12) // Adjusted font size for main content
          .fillColor("#1D3557")
-         .text(template.mainContent, { align: "center" })
+         .text(template.mainContent, { align: "center", lineGap: 4 }) // Added line gap for readability
          .moveDown(1.5);
 
       // Achievements section
       doc.font('Helvetica')
-         .fontSize(12)
+         .fontSize(10) // Slightly smaller for achievements
          .fillColor("#2A9D8F");
     
       template.achievements.forEach(achievement => {
@@ -144,37 +153,30 @@ const generateCertificate = async (
 
       // Endorsement
       doc.font('Helvetica')
-         .fontSize(12)
+         .fontSize(10) // Adjusted size for endorsement
          .fillColor("#234E70")
          .text(template.endorsement, { align: "center" })
          .moveDown(0.5)
          .text(template.impactStatement, { align: "center" })
          .moveDown(0.5)
          .text(template.closingStatement, { align: "center" })
-         .moveDown(2);
+         .moveDown(1.5);
 
       // Signature section
       const signatureY = doc.y;
     
       // Left signature
       doc.font('Helvetica')
-         .fontSize(12)
+         .fontSize(10) // Smaller size for signatures
          .fillColor("#1D3557")
-         .text("________________________", doc.page.width / 4, signatureY, { align: "center" })
+         .text("", doc.page.width / 4, signatureY, { align: "center" })
          .text("Program Director", doc.page.width / 4, signatureY + 20, { align: "center" });
 
       // Right signature
-      doc.text("________________________", (doc.page.width * 3) / 4, signatureY, { align: "center" })
+      doc.text("", (doc.page.width * 3) / 4, signatureY, { align: "center" })
          .text("Chief Executive Officer", (doc.page.width * 3) / 4, signatureY + 20, { align: "center" });
 
-      // Certificate footer
-      doc.font('Helvetica')
-         .fontSize(10)
-         .fillColor("#2A9D8F")
-         .text(`Certificate ID: ${template.certificationNumber}`, { align: "center" })
-         .moveDown(0.5)
-         .text(`Issued on: ${new Date().toLocaleDateString()}`, { align: "center" });
-
+ 
       // Finishing touches
       doc.end();
 

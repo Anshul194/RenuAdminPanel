@@ -39,7 +39,7 @@ const GenerateOfferLetter = async (req, res) => {
 };
 const GenerateStarIntern = async (req, res) => {
   try {
-    const { name, email, post, certificateName } = req.body;
+    const { name, email, post, department,certificateName } = req.body;
     console.log(req.body);
     const pdfBuffer = await pdfGenerator(name, email, post, certificateName);
 
@@ -71,10 +71,10 @@ const GenerateStarIntern = async (req, res) => {
 // Generate ICC Letter
 const GenerateICC = async (req, res) => {
   try {
-    const { name, email, post,startDate, endDate, tenure ,  certificateName } = req.body;
+    const { name, email, post,startDate, endDate, tenure ,  certificateName ,department} = req.body;
     console.log("Icc");
     console.log(name,email,post,certificateName);
-    const pdfBuffer = await IccGenerator(name, email, post,startDate, endDate , tenure ,  certificateName);
+    const pdfBuffer = await IccGenerator(name, email, post,startDate, endDate , tenure ,  certificateName,department);
 
     const user = await iccModel.findOne({ email });
     if (user && user.pdfBuffer) {
