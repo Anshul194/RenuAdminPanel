@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import signupSvg from "../../public/Group.png";
 import { useNavigate } from "react-router";
 import axios from "axios";
+import Cookies from "js-cookie"; // Import js-cookie
+import { Link } from "react-router-dom";
 
 function Signup() {
   const [name, setName] = useState("");
@@ -18,13 +20,22 @@ function Signup() {
       return;
     }
     try {
-      const response = await axios.post("/signup", {
-        name,
-        email,
-        password,
-      });
+      const response = await axios.post(
+        "http://localhost:8000/api/user/signup",
+        {
+          name,
+          email,
+          password,
+        },
+        {
+          withCredentials: true,
+        }
+      );
       console.log("Signup successful!", response.data);
-      navigate("/login");
+      console.log(response.data);
+
+      // Redirect to login page after successful signup
+      // navigate("/sidebar");
     } catch (err) {
       console.log(err);
       setErrorMessage("Signup failed. Please try again.");
@@ -84,9 +95,9 @@ function Signup() {
           <div className="mt-6 text-center">
             <p className="text-sm">
               Already have an account?{" "}
-              <a href="/" className="text-green-600 hover:underline">
+              <Link to="/" className="text-green-600 hover:underline">
                 Log in
-              </a>
+              </Link>
             </p>
           </div>
         </div>

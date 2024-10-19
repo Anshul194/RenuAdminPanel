@@ -1,15 +1,48 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 
 const LORCertificateForm = () => {
   const [formData, setFormData] = useState({
-    fullName: '',
+    name: '',
     email: '',
-    phoneNumber: '',
+    phone: '',
     department: '',
     post: '',
+    certificateName:'lor'
   });
 
   const [errors, setErrors] = useState({});
+
+  const handleDownload = async () => {
+    try {
+      const { data, headers } = await axios.get(
+        "http://localhost:8000/api/employee/lor",
+        {
+          params: { email: formData.email },
+          responseType: "blob", // This ensures the response is treated as a binary file
+        }
+      );
+
+      const fileName =
+        headers["content-disposition"]
+          ?.split("filename=")[1]
+          ?.replace(/"/g, "") || "offer_letter.pdf";
+
+      const blob = new Blob([data], {
+        type: headers["content-type"] || "application/pdf",
+      });
+
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.setAttribute("download", fileName);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(link.href);
+    } catch (err) {
+      console.error("Error in downloading file:", err);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -27,15 +60,15 @@ const LORCertificateForm = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.fullName) newErrors.fullName = "Full Name is required.";
+    if (!formData.name) newErrors.name = "Full Name is required.";
     if (!formData.email) newErrors.email = "Email is required.";
-    if (!formData.phoneNumber) newErrors.phoneNumber = "Phone Number is required.";
+    if (!formData.phone) newErrors.phone = "Phone Number is required.";
     if (!formData.department) newErrors.department = "Department is required.";
     if (!formData.post) newErrors.post = "Post is required.";
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const formErrors = validateForm();
     if (Object.keys(formErrors).length > 0) {
@@ -44,6 +77,22 @@ const LORCertificateForm = () => {
     }
     // Here, handle the form submission logic, like sending data to the backend
     console.log("Star Intern Certificate Form submitted:", formData);
+
+
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/api/employee/lor",
+        formData,
+        { withCredentials: true }
+      );
+
+      console.log("Form submitted successfully:", response);
+
+      // Trigger download immediately after successful form submission
+     await handleDownload();
+    } catch (err) {
+      console.error("Error submitting form:", err);
+    }
   };
 
   return (
@@ -56,13 +105,13 @@ const LORCertificateForm = () => {
           <label className="block text-gray-600">Full Name</label>
           <input
             type="text"
-            name="fullName"
-            value={formData.fullName}
+            name="name"
+            value={formData.name}
             onChange={handleChange}
-            className={`w-full p-2 border ${errors.fullName ? 'border-red-500' : 'border-gray-300'} rounded`}
+            className={`w-full p-2 border ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded`}
             required
           />
-          {errors.fullName && <span className="text-red-500 text-sm">{errors.fullName}</span>}
+          {errors.name && <span className="text-red-500 text-sm">{errors.name}</span>}
         </div>
 
         <div>
@@ -82,13 +131,13 @@ const LORCertificateForm = () => {
           <label className="block text-gray-600">Phone Number</label>
           <input
             type="tel"
-            name="phoneNumber"
-            value={formData.phoneNumber}
+            name="phone"
+            value={formData.phone}
             onChange={handleChange}
-            className={`w-full p-2 border ${errors.phoneNumber ? 'border-red-500' : 'border-gray-300'} rounded`}
+            className={`w-full p-2 border ${errors.phone ? 'border-red-500' : 'border-gray-300'} rounded`}
             required
           />
-          {errors.phoneNumber && <span className="text-red-500 text-sm">{errors.phoneNumber}</span>}
+          {errors.phone && <span className="text-red-500 text-sm">{errors.phone}</span>}
         </div>
 
         <div>

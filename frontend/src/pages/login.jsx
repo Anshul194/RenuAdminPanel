@@ -12,9 +12,11 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("/login", {
+      const response = await axios.post("http://localhost:8000/api/user/login", {
         email,
         password,
+      },{
+        withCredentials:true
       });
       console.log("Login successful!", response.data);
       navigate("/sidebar");
