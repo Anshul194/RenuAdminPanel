@@ -46,7 +46,7 @@ const GenerateOfferLetter = async (req, res) => {
       .json({ message: "Offer letter generation successful" });
   } catch (err) {
     console.error("Error in GenerateOfferLetter:", err.message);
-    return res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: err.message });
   }
 };
 const GenerateStarIntern = async (req, res) => {
@@ -88,7 +88,7 @@ const GenerateStarIntern = async (req, res) => {
       .json({ message: "Star Intern generation successful" });
   } catch (err) {
     console.error("Error in GenerateStarIntern:", err.message);
-    return res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: err.message });
   }
 };
 
@@ -132,7 +132,7 @@ const GenerateICC = async (req, res) => {
       .json({ message: "ICC letter generation successful" });
   } catch (err) {
     console.error("Error in GenerateICC:", err.message);
-    return res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: err.message });
   }
 };
 
@@ -164,7 +164,7 @@ const GenerateLOR = async (req, res) => {
     return res.status(200).json({ message: "LOR generation successful" });
   } catch (err) {
     console.error("Error in GenerateLOR:", err.message);
-    return res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: err.message });
   }
 };
 
@@ -185,7 +185,7 @@ const downloadOfferLetter = async (req, res) => {
     return res.status(200).send(employee.pdfBuffer);
   } catch (err) {
     console.error("Error in downloadOfferLetter:", err.message);
-    return res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: err.message });
   }
 };
 
@@ -206,7 +206,7 @@ const downloadICC = async (req, res) => {
     return res.status(200).send(employee.pdfBuffer);
   } catch (err) {
     console.error("Error in downloadICC:", err.message);
-    return res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: err.message });
   }
 };
 
@@ -227,7 +227,7 @@ const downloadLOR = async (req, res) => {
     return res.status(200).send(employee.pdfBuffer);
   } catch (err) {
     console.error("Error in downloadLOR:", err.message);
-    return res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ error:err.message });
   }
 };
 
@@ -248,7 +248,7 @@ const downloadStarIntern = async (req, res) => {
     return res.status(200).send(employee.pdfBuffer);
   } catch (err) {
     console.error("Error in downloadLOR:", err.message);
-    return res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: err.message});
   }
 };
 
