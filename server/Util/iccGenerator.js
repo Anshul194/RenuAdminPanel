@@ -113,3 +113,4 @@ const generateCertificate = async (
 };
 
 export default generateCertificate;
+

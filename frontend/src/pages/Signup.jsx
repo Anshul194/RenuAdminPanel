@@ -31,11 +31,9 @@ function Signup() {
           withCredentials: true,
         }
       );
-      console.log("Signup successful!", response.data);
-      console.log(response.data);
+      alert("Signup successful!");
 
-      // Redirect to login page after successful signup
-      // navigate("/sidebar");
+       navigate("/sidebar");
     } catch (err) {
       console.log(err);
       setErrorMessage("Signup failed. Please try again.");
