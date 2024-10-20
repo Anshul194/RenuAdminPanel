@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import axios from 'axios';
-import {toast} from 'react-toastify'
-
+import axios from "axios";
+import { toast } from "react-toastify";
+import DropDown from './components/DropDown.jsx';
 const StarInternCertificateForm = () => {
   const [formData, setFormData] = useState({
     name: "",
@@ -68,7 +68,6 @@ const StarInternCertificateForm = () => {
     } catch (err) {
       console.error("Error in downloading file:", err);
       toast.error(err.response.data.error);
-
     }
   };
 
@@ -95,7 +94,6 @@ const StarInternCertificateForm = () => {
     } catch (err) {
       console.error("Error submitting form:", err);
       toast.error(err.response.data.error);
-
     }
   };
 

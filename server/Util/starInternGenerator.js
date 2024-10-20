@@ -23,7 +23,7 @@ const getCertificateContent = (name, post, duration, department) => {
   ).join(' ');
 
   return {
-    title: "Certificate of Excellence",
+    title: "StarIntern",
     subtitle: "Outstanding Achievement Award",
     organization: "Renu Sharma Healthcare Education & Foundation",
     mainContent: {
@@ -31,7 +31,7 @@ const getCertificateContent = (name, post, duration, department) => {
       position: formattedPost,
       department: department,
       // Remove duplicate "months"
-      duration: `${duration} months`,
+      duration: `${duration}`,
       date: new Date().toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',
