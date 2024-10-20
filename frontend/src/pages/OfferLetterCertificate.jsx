@@ -1,7 +1,7 @@
 import axios from "axios";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
-
+import DropDown from './components/DropDown.jsx';
 const OfferLetterCertificateForm = () => {
   const [formData, setFormData] = useState({
     name: "",
@@ -218,16 +218,7 @@ const OfferLetterCertificateForm = () => {
 
         <div>
           <label className="block text-gray-600">Department</label>
-          <input
-            type="text"
-            name="department"
-            value={formData.department}
-            onChange={handleChange}
-            className={`w-full p-2 border ${
-              errors.department ? "border-red-500" : "border-gray-300"
-            } rounded`}
-            required
-          />
+          <DropDown setFormData = {setFormData} formData = {formData} required />
           {errors.department && (
             <span className="text-red-500 text-sm">{errors.department}</span>
           )}

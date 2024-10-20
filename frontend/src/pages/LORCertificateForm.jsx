@@ -158,16 +158,7 @@ const LORCertificateForm = () => {
 
         <div>
           <label className="block text-gray-600">Department</label>
-          <input
-            type="text"
-            name="department"
-            value={formData.department}
-            onChange={handleChange}
-            className={`w-full p-2 border ${
-              errors.department ? "border-red-500" : "border-gray-300"
-            } rounded`}
-            required
-          />
+          <DropDown formData={formData} setFormData={setFormData} required/>
           {errors.department && (
             <span className="text-red-500 text-sm">{errors.department}</span>
           )}

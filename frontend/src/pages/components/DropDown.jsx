@@ -1,43 +1,39 @@
-import React, { useState } from 'react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import React, { useEffect, useState } from "react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
-const InternshipDropdown = () => {
+const InternshipDropdown = ({ setFormData, formData }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
 
   const categories = {
-    "Technology": [
-      "UI/UX Design",
-      "Graphic Designing",
-      "Video Editing"
-    ],
+    Technology: ["UI/UX Design", "Graphic Designing", "Video Editing"],
     "Marketing & Communications": [
       "Social Media Marketing",
       "Content Writing",
       "Public Relations",
-      "Telecalling"
+      "Telecalling",
     ],
     "Social Impact": [
       "Fundraising Intern",
       "Charity Intern",
       "Medical Volunteer",
-      "Corporate Social Responsibility (CSR)"
+      "Corporate Social Responsibility (CSR)",
     ],
-    "Management": [
+    Management: [
       "Human Resource",
       "Team Leader",
       "Campus Ambassador",
-      "Business Executive"
-    ]
+      "Business Executive",
+    ],
   };
- 
+
   return (
-    <div className="w-full max-w-md mx-auto">
+    <div className="w-full  mx-auto">
       {/* Main Dropdown Button */}
       <div className="relative">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="w-full bg-white rounded-lg border border-gray-200 px-4 py-3 text-left shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+          className="w-full bg-white rounded-lg border border-gray-200 px-4 py-2 text-left shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
         >
           <div className="flex items-center justify-between">
             <span className="block truncate text-gray-700">
@@ -64,6 +60,10 @@ const InternshipDropdown = () => {
                     <button
                       key={position}
                       onClick={() => {
+                        setFormData({
+                          ...formData,
+                          department: position,
+                        });
                         setSelectedCategory(position);
                         setIsOpen(false);
                       }}
@@ -78,25 +78,6 @@ const InternshipDropdown = () => {
           </div>
         )}
       </div>
-
-      {/* Selected Position Display */}
-      {selectedCategory && (
-        <div className="mt-4 p-4 bg-blue-50 rounded-lg">
-          <p className="text-sm text-blue-800 font-medium">Selected Position:</p>
-          <p className="mt-1 text-blue-900">{selectedCategory}</p>
-          <div className="mt-2 flex space-x-2">
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-              3 Months
-            </span>
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-              Certificate
-            </span>
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-              Stipend
-            </span>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
