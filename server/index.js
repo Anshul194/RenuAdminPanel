@@ -5,7 +5,7 @@ import cors from "cors";
 import connectDb from "./config/connectdb.js";
 import routes from "./routes/index.js";
 import cookieParser from "cookie-parser";
-
+import mailer from './Util/mailer.js';
 dotenv.config();
 
 const app = express();
@@ -36,3 +36,5 @@ app.use(cookieParser());
 
 // Load Routes
 app.use("/api", routes);
+
+// mailer();

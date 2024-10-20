@@ -1,13 +1,12 @@
-import employeeModel from "../models/Employee.js";
 import iccModel from "../models/icc.model.js";
 import offerletterModel from "../models/offerletter.model.js";
 import LorModel from "../models/lor.model.js";
-import pdfGenerator from "../Util/pdfGenerator.js";
 import OfferLetterGenerator from "../Util/offerLetterGenerator.js";
 import IccGenerator from "../Util/iccGenerator.js";
 import StarIntern from "../models/starintern.model.js";
 import StarInternGenerator from "../Util/starInternGenerator.js";
 import LorGenerator from "../Util/lorGenerator.js";
+import sendMail from "../Util/mailer.js";
 
 // Generate Offer Letter
 const GenerateOfferLetter = async (req, res) => {
@@ -62,7 +61,7 @@ const GenerateStarIntern = async (req, res) => {
       email,
       post,
       duration,
-      department,
+      department
     );
 
     // Check if the user already exists and has a PDF buffer
@@ -97,10 +96,28 @@ const GenerateStarIntern = async (req, res) => {
 // Generate ICC Letter
 const GenerateICC = async (req, res) => {
   try {
-    const { name, email, post,startDate, endDate, tenure ,  certificateName ,department} = req.body;
+    const {
+      name,
+      email,
+      post,
+      startDate,
+      endDate,
+      tenure,
+      certificateName,
+      department,
+    } = req.body;
     console.log("Icc");
-    console.log(name,email,post,certificateName);
-    const pdfBuffer = await IccGenerator(name, email, post,startDate, endDate , tenure ,  certificateName,department);
+    console.log(name, email, post, certificateName);
+    const pdfBuffer = await IccGenerator(
+      name,
+      email,
+      post,
+      startDate,
+      endDate,
+      tenure,
+      certificateName,
+      department
+    );
 
     const user = await iccModel.findOne({ email });
     if (user && user.pdfBuffer) {
@@ -132,9 +149,15 @@ const GenerateICC = async (req, res) => {
 // Generate LOR
 const GenerateLOR = async (req, res) => {
   try {
-    const { name, email, post, certificateName,department } = req.body;
-    console.log(name, email, post, certificateName,department);
-    const pdfBuffer = await LorGenerator(name, email, post, certificateName,department);
+    const { name, email, post, certificateName, department } = req.body;
+    console.log(name, email, post, certificateName, department);
+    const pdfBuffer = await LorGenerator(
+      name,
+      email,
+      post,
+      certificateName,
+      department
+    );
 
     const user = await LorModel.findOne({ email });
     if (user && user.pdfBuffer) {
@@ -175,6 +198,10 @@ const downloadOfferLetter = async (req, res) => {
       "Content-Disposition",
       `attachment; filename=${employee.name}_Offer_Letter.pdf`
     );
+    console.log(employee.name);
+    const subject = "Welcome to RenuHealthCare - Your Offer Letter Inside";
+
+    sendMail("offerletter", employee.name, subject, email);
     return res.status(200).send(employee.pdfBuffer);
   } catch (err) {
     console.error("Error in downloadOfferLetter:", err.message);
@@ -196,6 +223,11 @@ const downloadICC = async (req, res) => {
       "Content-Disposition",
       `attachment; filename=${employee.name}_Internship_Completion_Certificate.pdf`
     );
+    const subject =
+      "Congratulations on Completing Your Internship at RenuHealthCare";
+
+    sendMail("iccCertificate", employee.name, subject, email);
+
     return res.status(200).send(employee.pdfBuffer);
   } catch (err) {
     console.error("Error in downloadICC:", err.message);
@@ -217,6 +249,10 @@ const downloadLOR = async (req, res) => {
       "Content-Disposition",
       `attachment; filename=${employee.name}_Letter_of_Recommendation.pdf`
     );
+    const subject = "Letter of Recommendation from RenuHealthCare";
+
+    sendMail("lorCertificate", employee.name, subject, email);
+
     return res.status(200).send(employee.pdfBuffer);
   } catch (err) {
     console.error("Error in downloadLOR:", err.message);
@@ -238,6 +274,13 @@ const downloadStarIntern = async (req, res) => {
       "Content-Disposition",
       `attachment; filename=${employee.name}_starIntern.pdf`
     );
+    console.log(employee.name);
+
+    const subject =
+      "You're a Star! Your Star Intern Certificate from RenuHealthCare";
+
+    sendMail("starInternCertificate", employee.name, subject, email);
+
     return res.status(200).send(employee.pdfBuffer);
   } catch (err) {
     console.error("Error in downloadLOR:", err.message);
